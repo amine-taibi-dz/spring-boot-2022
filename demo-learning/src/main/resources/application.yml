@@ -1,0 +1,39 @@
+server:
+  port : 8085
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: none
+    show-sql: true  
+  datasource:
+    url: jdbc:mysql://localhost:3306/learn?useSSL=false&allowPublicKeyRetrieval=true
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
+#  data:
+#    mongodb:
+#      host: localhost
+#      port: 27017 
+#      username: 
+#      database: test0
+#      password:
+  mongodb:
+    embedded:
+      version: 3.0.0
+logging:
+  file:
+    name: log-demo.log
+    path: /demo-logs
+  level:
+    org:
+      hibernate : error 
+    dz:
+      acs:
+        learn: WARN
+    root: INFO
+  logback:
+    rollingpolicy:
+      max-file-size: 1Mb
+  pattern:
+    console: '%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{15} - %msg%n'
