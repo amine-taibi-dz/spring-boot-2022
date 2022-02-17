@@ -1,0 +1,47 @@
+elit:
+  print:
+    prefix: "*******"
+    suffix: "!!!!!"
+  fact:
+    taux: 20
+    taux-reduit: 10
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    database: mysql
+    generate-ddl: true
+    hibernate:      
+      ddl-auto: none
+    show-sql: true  
+  datasource:
+    url: jdbc:mysql://localhost:3306/memoire?useSSL=false&allowPublicKeyRetrieval=true
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
+logging:
+  file:
+    name: mem.log
+  level:
+    root : info  	
+    dz:
+      acs:
+        mem: debug
+  logback:
+    rollingpolicy:
+      max-file-size: 1Mb
+server:
+  port: 8081 
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include:
+        - env
+        - info
+        - beans
+        - health
+        - loggers
+        - mappings
+  

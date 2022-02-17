@@ -1,0 +1,138 @@
+
+package dz.acs.mem;
+
+import static org.hamcrest.Matchers.any;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import dz.acs.mem.model.sql.Celebrity;
+import dz.acs.mem.service.CelebrityService;
+import dz.acs.mem.service.EmployeeService;
+
+@WebMvcTest
+public class CelebrityApiTests {
+	@Autowired
+	private MockMvc mvc;
+	
+	@MockBean
+	private EmployeeService employeeService;
+	
+	@MockBean
+	private CelebrityService celebrityService;
+	/**
+	 * si je tape GET /api/v1/festival/100 => 200 OK
+	 * { 
+	 *   "ident":100,
+	 *   "name":"Woody Allen",
+	 *   "occupation":"Realisateur"
+	 * }
+	 * @throws Exception 
+	 */
+	@Test
+	public void testFindById() throws Exception {
+		// given ==> method call celebrityService.findById(100)
+		// return new Celebrity(100,"Woody Allen","Realisateur")  
+		given(celebrityService.findById(100))
+		  .willReturn(new Celebrity(100,"Woody Allen","Realisateur"));
+		
+		mvc.perform(get("/api/v1/festival/{id}",100)
+				.accept(MediaType.APPLICATION_JSON))
+		.andExpect(status().is2xxSuccessful())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+		.andExpect(jsonPath("ident").value(100))
+		.andExpect(jsonPath("name").value("Woody Allen"))
+		.andExpect(jsonPath("occupation").value("Realisateur"));
+		 
+	}
+	
+	@Test
+	public void testFindByIdWithYear() throws Exception {
+		// given ==> method call celebrityService.findById(100)
+		// return new Celebrity(100,"Woody Allen","Realisateur")  
+		given(celebrityService.findById(100))
+		  .willReturn(new Celebrity(100,"Woody Allen","Realisateur",1955));
+		
+		mvc.perform(get("/api/v1/festival/{id}",100).accept(MediaType.APPLICATION_JSON))
+		.andExpect(status().is2xxSuccessful())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+		.andExpect(jsonPath("ident").value(100))
+		.andExpect(jsonPath("name").value("Woody Allen"))
+		.andExpect(jsonPath("occupation").value("Realisateur"))
+		.andExpect(jsonPath("year").value(1955));
+		 
+	}
+	
+	
+	
+	@Test
+	public void testCreateCelebrity() throws Exception {
+		Celebrity cel =  new Celebrity("Woody Allen","Realisateur",1_955);
+		
+		// given ==> method call celebrityService.findById(100)
+		// return new Celebrity(100,"Woody Allen","Realisateur")  
+		given(celebrityService.create(ArgumentMatchers.any(Celebrity.class)))
+		  .willReturn(new Celebrity(100,"Woody Allen","Realisateur",1_955));
+		
+		mvc.perform(
+			  post("/api/v1/festival/add")
+				.content(transform(cel))
+				.accept(MediaType.APPLICATION_JSON_VALUE)
+				.contentType(MediaType.APPLICATION_JSON_VALUE)
+			)
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+		.andExpect(jsonPath("ident").value(100))
+		.andExpect(jsonPath("name").value("Woody Allen"))
+		.andExpect(jsonPath("occupation").value("Realisateur"))
+		.andExpect(jsonPath("year").value(1_955));
+		 
+	}
+
+	private String transform(Celebrity cel) throws JsonProcessingException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		return objectMapper.writeValueAsString(cel);
+	}
+	
+	@Test
+	public void testFindList() throws Exception {
+		// given ==> method call celebrityService.findById(100)
+		// return new Celebrity(100,"Woody Allen","Realisateur")
+		List<Celebrity> res = new ArrayList<>();
+		res.add(new Celebrity(100,"Woody Allen","Realisateur"));
+		res.add(new Celebrity(200,"Prad Pitt","Acteur"));
+		//  
+		given(celebrityService.findAll()).willReturn(res);
+		
+		mvc.perform(get("/api/v1/festival/list")
+				.accept(MediaType.APPLICATION_JSON)
+				)
+		.andExpect(status().is2xxSuccessful())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+		.andExpect(jsonPath("$", hasSize(2)))
+		.andExpect(jsonPath("$[*].ident", contains(100,200)));
+		 
+	}
+	
+
+}

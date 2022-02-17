@@ -1,0 +1,20 @@
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+logging:
+  file:
+    name: mem.log
+  level:
+    root : info  	
+    dz:
+      acs:
+        mem: debug
+  logback:
+    rollingpolicy:
+      max-file-size: 1Mb
+  
+  
